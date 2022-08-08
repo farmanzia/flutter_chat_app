@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'home.dart';
+import 'resetScreen.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -21,13 +22,7 @@ class _LogInScreenState extends State<LogInScreen> {
           .showSnackBar(SnackBar(content: Text("all field mendatory")));
     } else {
       logIn(emailController.text.trim(), passwordController.text);
-
-      // ScaffoldMessenger.of(context)
-      //     .showSnackBar(SnackBar(content: Text("User Does Not Exist")));
     }
-    // else {
-    //
-    // }
   }
 
   logIn(String email, String password) async {
@@ -82,7 +77,10 @@ class _LogInScreenState extends State<LogInScreen> {
               Align(
                 alignment: Alignment.centerRight,
                 child: InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (_) => ResetScreen()));
+                    },
                     child: const Text(
                       "forgot password ?",
                       style: TextStyle(color: Colors.purple),
