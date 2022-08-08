@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 import 'screen/login.dart';
 
-void main() async {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp;
+  await Firebase.initializeApp();
 
   runApp(const MyApp());
 }

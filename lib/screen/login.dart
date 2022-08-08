@@ -1,5 +1,8 @@
 import 'package:chatapp_firebase/screen/signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import 'home.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({Key? key}) : super(key: key);
@@ -9,6 +12,37 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  User? user;
+  checkValues() async {
+    if (emailController.text.trim() == "" || passwordController.text == "") {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("all field mendatory")));
+    } else {
+      logIn(emailController.text.trim(), passwordController.text);
+
+      // ScaffoldMessenger.of(context)
+      //     .showSnackBar(SnackBar(content: Text("User Does Not Exist")));
+    }
+    // else {
+    //
+    // }
+  }
+
+  logIn(String email, String password) async {
+    UserCredential? userCredential;
+    try {
+      userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: password);
+      // .createUserWithEmailAndPassword(email: email, password: password);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+    } on FirebaseAuthException catch (ex) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(ex.code.toString())));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,12 +66,14 @@ class _LogInScreenState extends State<LogInScreen> {
                 height: 12,
               ),
               TextFormField(
+                controller: emailController,
                 decoration: InputDecoration(hintText: "Email"),
               ),
               const SizedBox(
                 height: 12,
               ),
               TextFormField(
+                controller: passwordController,
                 decoration: InputDecoration(hintText: "Password"),
               ),
               const SizedBox(
@@ -58,7 +94,10 @@ class _LogInScreenState extends State<LogInScreen> {
               SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: ElevatedButton(
-                      onPressed: () {}, child: const Text("LOGIN"))),
+                      onPressed: () {
+                        checkValues();
+                      },
+                      child: const Text("LOGIN"))),
               const SizedBox(
                 height: 8,
               ),
