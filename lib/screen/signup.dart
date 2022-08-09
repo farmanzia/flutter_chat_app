@@ -1,9 +1,9 @@
 import 'package:chatapp_firebase/models/userModel.dart';
 import 'package:chatapp_firebase/screen/home.dart';
-import 'package:chatapp_firebase/screen/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -54,6 +54,39 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
+  pickedImage(ImageSource source) async {
+    XFile? pickedFile =
+        await ImagePicker().pickImage(source: source, imageQuality: 20);
+  }
+
+  dialougeBox() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Pick Profile Image"),
+            content: Column(mainAxisSize: MainAxisSize.min, children: [
+              ListTile(
+                onTap: () async {
+                  pickedImage(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+                leading: Icon(Icons.browse_gallery_outlined),
+                title: Text("Gallery"),
+              ),
+              ListTile(
+                onTap: () {
+                  pickedImage(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+                leading: Icon(Icons.camera_alt),
+                title: Text("Camera"),
+              )
+            ]),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,6 +110,9 @@ class _SignUpState extends State<SignUp> {
                 height: 12,
               ),
               GestureDetector(
+                onTap: () {
+                  dialougeBox();
+                },
                 child: CircleAvatar(
                   radius: 40,
                   child: Icon(
