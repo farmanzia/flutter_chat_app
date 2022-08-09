@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:chatapp_firebase/models/userModel.dart';
 import 'package:chatapp_firebase/screen/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SignUp extends StatefulWidget {
@@ -54,9 +57,22 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
+  File? imagefile;
+
   pickedImage(ImageSource source) async {
     XFile? pickedFile =
         await ImagePicker().pickImage(source: source, imageQuality: 20);
+    croppedfile(pickedFile!);
+  }
+
+  croppedfile(XFile file) async {
+    CroppedFile? croppedImage = await ImageCropper.platform
+        .cropImage(sourcePath: file.path, compressQuality: 20);
+    if (croppedImage != null) {
+      setState(() {
+        imagefile = croppedImage as File?;
+      });
+    }
   }
 
   dialougeBox() {
@@ -114,6 +130,8 @@ class _SignUpState extends State<SignUp> {
                   dialougeBox();
                 },
                 child: CircleAvatar(
+                  backgroundImage:
+                      imagefile == null ? FileImage(imagefile!) : null,
                   radius: 40,
                   child: Icon(
                     Icons.person,
