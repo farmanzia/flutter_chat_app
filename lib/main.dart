@@ -1,4 +1,3 @@
-import 'package:chatapp_firebase/screen/resetScreen.dart';
 import 'package:chatapp_firebase/screen/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.deepPurple,
       ),
-      home: LogInScreen(),
+      home: SignUp(),
     );
   }
 }
