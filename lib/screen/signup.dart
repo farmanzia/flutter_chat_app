@@ -1,16 +1,24 @@
+import 'dart:io';
+
 import 'package:chatapp_firebase/models/userModel.dart';
 import 'package:chatapp_firebase/screen/home.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SignUp extends StatefulWidget {
+  // SignUp({required this.imageFile,required this.imgUrl})
   @override
   State<SignUp> createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
+  XFile? imageFile;
+  String? imgUrl;
+
+  ImagePicker? imagePicker;
   TextEditingController fullNamecontroller = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -35,7 +43,6 @@ class _SignUpState extends State<SignUp> {
     try {
       userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      print("ok");
     } on FirebaseAuthException catch (ex) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(ex.code.toString())));
@@ -45,46 +52,13 @@ class _SignUpState extends State<SignUp> {
           uid: userCredential.user!.uid,
           fullname: fullNamecontroller.text,
           email: emailController.text.trim(),
-          profilepic: "");
+          profilepic: imageFile.toString());
       await FirebaseFirestore.instance
           .collection("user")
           .doc(userCredential.user!.uid)
           .set(userModel.toMap());
       Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
     }
-  }
-
-  pickedImage(ImageSource source) async {
-    XFile? pickedFile =
-        await ImagePicker().pickImage(source: source, imageQuality: 20);
-  }
-
-  dialougeBox() {
-    showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Pick Profile Image"),
-            content: Column(mainAxisSize: MainAxisSize.min, children: [
-              ListTile(
-                onTap: () async {
-                  pickedImage(ImageSource.gallery);
-                  Navigator.pop(context);
-                },
-                leading: Icon(Icons.browse_gallery_outlined),
-                title: Text("Gallery"),
-              ),
-              ListTile(
-                onTap: () {
-                  pickedImage(ImageSource.camera);
-                  Navigator.pop(context);
-                },
-                leading: Icon(Icons.camera_alt),
-                title: Text("Camera"),
-              )
-            ]),
-          );
-        });
   }
 
   @override
@@ -114,6 +88,9 @@ class _SignUpState extends State<SignUp> {
                   dialougeBox();
                 },
                 child: CircleAvatar(
+                  backgroundImage: imageFile != null
+                      ? FileImage(File(imageFile!.path))
+                      : null,
                   radius: 40,
                   child: Icon(
                     Icons.person,
@@ -189,5 +166,55 @@ class _SignUpState extends State<SignUp> {
         ),
       )),
     );
+  }
+
+  pickedImage(ImageSource source) async {
+    final XFile? image =
+        await imagePicker!.pickImage(source: ImageSource.gallery);
+    // await imagePicker.pickImage(source: source, imageQuality: 20);
+    croppedfile(image as PickedFile);
+    // setState(() {
+    //   imageFile = image;
+
+    //   croppedfile(imageFile as PickedFile);
+    // });
+  }
+
+  croppedfile(PickedFile file) async {
+    CroppedFile? croppedImage = await ImageCropper.platform
+        .cropImage(sourcePath: file.path, compressQuality: 20);
+    if (croppedImage != null) {
+      setState(() {
+        imageFile = croppedImage as XFile?;
+      });
+    }
+  }
+
+  dialougeBox() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Pick Profile Image"),
+            content: Column(mainAxisSize: MainAxisSize.min, children: [
+              ListTile(
+                onTap: () async {
+                  pickedImage(ImageSource.gallery);
+                  Navigator.pop(context);
+                },
+                leading: Icon(Icons.browse_gallery_outlined),
+                title: Text("Gallery"),
+              ),
+              ListTile(
+                onTap: () {
+                  pickedImage(ImageSource.camera);
+                  Navigator.pop(context);
+                },
+                leading: Icon(Icons.camera_alt),
+                title: Text("Camera"),
+              )
+            ]),
+          );
+        });
   }
 }
