@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ResetScreen extends StatefulWidget {
@@ -8,6 +9,9 @@ class ResetScreen extends StatefulWidget {
 }
 
 class _ResetScreenState extends State<ResetScreen> {
+  TextEditingController controller = TextEditingController();
+  final auth = FirebaseAuth.instance;
+  User? user;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +25,7 @@ class _ResetScreenState extends State<ResetScreen> {
             child: Column(
           children: [
             TextFormField(
+              controller: controller,
               decoration: InputDecoration(hintText: "Reset Email"),
             ),
             const SizedBox(
@@ -28,10 +33,41 @@ class _ResetScreenState extends State<ResetScreen> {
             ),
             SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(onPressed: () {}, child: Text("Reset")))
+                child: ElevatedButton(
+                    onPressed: () {
+                      // print(controller.text.trim());
+                      resetPassword(controller.text.trim());
+                    },
+                    child: Text("Reset")))
           ],
         )),
       ),
     );
   }
+
+  resetPassword(String email) async {
+    try {
+      await auth.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Email Sent")));
+      // .catchError((e) => print(e));
+    } on FirebaseAuthException catch (ex) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(ex.code.toString())));
+    }
+  }
+  // resetPassword(String email) async {
+  //   // if (user != auth.currentUser) {
+  //   await auth
+  //       .sendPasswordResetEmail(email: email)
+  //       .then((value) => ScaffoldMessenger.of(context)
+  //           .showSnackBar(SnackBar(content: Text("Email Sent"))))
+  //       .catchError(
+  //           (e) => FirebaseAuthException(code: "Some Thing Gone Wrong"));
+  //   // }
+  //   //  on FirebaseAuthException catch (ex) {
+  //   //   ScaffoldMessenger.of(context)
+  //   //       .showSnackBar(SnackBar(content: Text(ex.code.toString())));
+  //   // }
+  // }
 }
