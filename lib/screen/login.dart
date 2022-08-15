@@ -1,12 +1,16 @@
+import 'package:chatapp_firebase/models/userModel.dart';
+import 'package:chatapp_firebase/screen/homeScreen.dart';
+import 'package:chatapp_firebase/screen/searchScreen.dart';
 import 'package:chatapp_firebase/screen/signup.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import 'home.dart';
+import 'chatScreen.dart';
 import 'resetScreen.dart';
 
 class LogInScreen extends StatefulWidget {
-  const LogInScreen({Key? key}) : super(key: key); 
+  const LogInScreen({Key? key}) : super(key: key);
 
   @override
   State<LogInScreen> createState() => _LogInScreenState();
@@ -19,22 +23,31 @@ class _LogInScreenState extends State<LogInScreen> {
   checkValues() async {
     if (emailController.text.trim() == "" || passwordController.text == "") {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("all field mendatory")));
+          .showSnackBar(const SnackBar(content: Text("all field mendatory")));
     } else {
-      logIn(emailController.text.trim(), passwordController.text);
+      signUp(emailController.text.trim(), passwordController.text);
     }
   }
 
-  logIn(String email, String password) async {
-    UserCredential? userCredential;
+  signUp(String email, String password) async {
+    UserCredential? credential;
     try {
-      userCredential = await FirebaseAuth.instance
+      credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      // .createUserWithEmailAndPassword(email: email, password: password);
       Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
     } on FirebaseAuthException catch (ex) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(ex.code.toString())));
+    }
+    if (credential != null) {
+      String uid = credential.user!.uid;
+
+      DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+          .collection("chatapp_user")
+          .doc(uid)
+          .get();
+      UserModel userModel =
+          UserModel.fromMap(documentSnapshot as Map<String, dynamic>);
     }
   }
 
@@ -51,7 +64,7 @@ class _LogInScreenState extends State<LogInScreen> {
               const Text("Chat App",
                   style: TextStyle(
                     fontSize: 30,
-                    color: Colors.purple,
+                    color: Colors.teal,
                   )),
               const Text(
                 "now come to close",
@@ -62,14 +75,14 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(hintText: "Email"),
+                decoration: const InputDecoration(hintText: "Email"),
               ),
               const SizedBox(
                 height: 12,
               ),
               TextFormField(
                 controller: passwordController,
-                decoration: InputDecoration(hintText: "Password"),
+                decoration: const InputDecoration(hintText: "Password"),
               ),
               const SizedBox(
                 height: 24,
@@ -78,12 +91,14 @@ class _LogInScreenState extends State<LogInScreen> {
                 alignment: Alignment.centerRight,
                 child: InkWell(
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (_) => ResetScreen()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const ResetScreen()));
                     },
                     child: const Text(
                       "forgot password ?",
-                      style: TextStyle(color: Colors.purple),
+                      style: TextStyle(color: Colors.teal),
                     )),
               ),
               const SizedBox(
@@ -115,7 +130,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       },
                       child: const Text(
                         "SignUp",
-                        style: TextStyle(color: Colors.purple),
+                        style: TextStyle(color: Colors.teal),
                       )),
                 ],
               )

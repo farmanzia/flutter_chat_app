@@ -1,24 +1,27 @@
 import 'dart:io';
 
 import 'package:chatapp_firebase/models/userModel.dart';
-import 'package:chatapp_firebase/screen/home.dart';
+import 'package:chatapp_firebase/screen/chatScreen.dart';
+import 'package:chatapp_firebase/screen/login.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
 class SignUp extends StatefulWidget {
+  const SignUp({Key? key}) : super(key: key);
+
   // SignUp({required this.imageFile,required this.imgUrl})
   @override
   State<SignUp> createState() => _SignUpState();
 }
 
 class _SignUpState extends State<SignUp> {
-  XFile? imageFile;
+  PickedFile? imageFile;
   String? imgUrl;
 
-  ImagePicker? imagePicker;
+  final imagePicker = ImagePicker();
   TextEditingController fullNamecontroller = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -29,10 +32,10 @@ class _SignUpState extends State<SignUp> {
         passwordController.text == "" ||
         rpasswordController.text == "") {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("all field mendatory")));
+          .showSnackBar(const SnackBar(content: Text("all field mendatory")));
     } else if (passwordController.text != rpasswordController.text) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("password miss match")));
+          .showSnackBar(const SnackBar(content: Text("password miss match")));
     } else {
       signUp(emailController.text.trim(), passwordController.text);
     }
@@ -43,21 +46,49 @@ class _SignUpState extends State<SignUp> {
     try {
       userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => LogInScreen()));
     } on FirebaseAuthException catch (ex) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(ex.code.toString())));
     }
+    //save data to firestore database
     if (userCredential != null) {
+      // UserModel userFullName =
+      // UserModel(fullname: fullNamecontroller.text.trim());
+      String emailStorage = userCredential.user!.email.toString();
+      String uid = userCredential.user!.uid;
+
+      // String imgUrl;
+      final firebaseStorage = FirebaseStorage.instance;
+      var file = File(imageFile!.path);
+      if (imageFile != null) {
+        var snapshot = await firebaseStorage
+            .ref('profilePictures')
+            .child(fullNamecontroller.text)
+            .putFile(file);
+        TaskSnapshot taskSnapshot = await snapshot;
+
+        String imageUrl = await snapshot.ref.getDownloadURL();
+
+        setState(() {
+          imgUrl = imageUrl;
+        });
+      }
       UserModel userModel = UserModel(
           uid: userCredential.user!.uid,
           fullname: fullNamecontroller.text,
           email: emailController.text.trim(),
-          profilepic: imageFile.toString());
+          profilepic: imgUrl);
       await FirebaseFirestore.instance
-          .collection("user")
-          .doc(userCredential.user!.uid)
+          .collection("chatapp_user")
+          .doc(uid)
           .set(userModel.toMap());
-      Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+      //       {
+      //   "full_name": fullNamecontroller.text,
+      //   "email": emailController.text.trim(),
+      //   "imgUrl": imgUrl
+      // }
+
     }
   }
 
@@ -74,7 +105,7 @@ class _SignUpState extends State<SignUp> {
               const Text("Chat App",
                   style: TextStyle(
                     fontSize: 30,
-                    color: Colors.purple,
+                    color: Colors.teal,
                   )),
               const Text(
                 "now come to close",
@@ -93,7 +124,7 @@ class _SignUpState extends State<SignUp> {
                       : null,
                   radius: 40,
                   child: Icon(
-                    Icons.person,
+                    imageFile == null ? Icons.person : null,
                     size: 30,
                   ),
                 ),
@@ -103,28 +134,28 @@ class _SignUpState extends State<SignUp> {
               ),
               TextFormField(
                 controller: fullNamecontroller,
-                decoration: InputDecoration(hintText: "Full Name"),
+                decoration: const InputDecoration(hintText: "Full Name"),
               ),
               const SizedBox(
                 height: 12,
               ),
               TextFormField(
                 controller: emailController,
-                decoration: InputDecoration(hintText: "Email"),
+                decoration: const InputDecoration(hintText: "Email"),
               ),
               const SizedBox(
                 height: 12,
               ),
               TextFormField(
                 controller: passwordController,
-                decoration: InputDecoration(hintText: "Password"),
+                decoration: const InputDecoration(hintText: "Password"),
               ),
               const SizedBox(
                 height: 12,
               ),
               TextFormField(
                 controller: rpasswordController,
-                decoration: InputDecoration(hintText: "Repeat Password"),
+                decoration: const InputDecoration(hintText: "Repeat Password"),
               ),
               const SizedBox(
                 height: 24,
@@ -157,7 +188,7 @@ class _SignUpState extends State<SignUp> {
                       },
                       child: const Text(
                         "LogIn",
-                        style: TextStyle(color: Colors.purple),
+                        style: TextStyle(color: Colors.teal),
                       )),
                 ],
               )
@@ -169,49 +200,46 @@ class _SignUpState extends State<SignUp> {
   }
 
   pickedImage(ImageSource source) async {
-    final XFile? image =
-        await imagePicker!.pickImage(source: ImageSource.gallery);
+    final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
     // await imagePicker.pickImage(source: source, imageQuality: 20);
-    croppedfile(image as PickedFile);
-    // setState(() {
-    //   imageFile = image;
-
-    //   croppedfile(imageFile as PickedFile);
-    // });
+    // croppedfile(pickedFile);
+    setState(() {
+      imageFile = pickedFile;
+    });
   }
 
-  croppedfile(PickedFile file) async {
-    CroppedFile? croppedImage = await ImageCropper.platform
-        .cropImage(sourcePath: file.path, compressQuality: 20);
-    if (croppedImage != null) {
-      setState(() {
-        imageFile = croppedImage as XFile?;
-      });
-    }
-  }
+  // croppedfile(PickedFile file) async {
+  //   CroppedFile? croppedImage = await ImageCropper.platform
+  //       .cropImage(sourcePath: file.path, compressQuality: 20);
+  //   if (croppedImage != null) {
+  //     setState(() {
+  //       imageFile = croppedImage;
+  //     });
+  //   }
+  // }
 
   dialougeBox() {
     showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: Text("Pick Profile Image"),
+            title: const Text("Pick Profile Image"),
             content: Column(mainAxisSize: MainAxisSize.min, children: [
               ListTile(
                 onTap: () async {
                   pickedImage(ImageSource.gallery);
                   Navigator.pop(context);
                 },
-                leading: Icon(Icons.browse_gallery_outlined),
-                title: Text("Gallery"),
+                leading: const Icon(Icons.browse_gallery_outlined),
+                title: const Text("Gallery"),
               ),
               ListTile(
                 onTap: () {
                   pickedImage(ImageSource.camera);
                   Navigator.pop(context);
                 },
-                leading: Icon(Icons.camera_alt),
-                title: Text("Camera"),
+                leading: const Icon(Icons.camera_alt),
+                title: const Text("Camera"),
               )
             ]),
           );
