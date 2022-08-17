@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chatapp_firebase/models/userModel.dart';
 import 'package:chatapp_firebase/screen/homeScreen.dart';
 import 'package:chatapp_firebase/screen/searchScreen.dart';
@@ -10,7 +12,10 @@ import 'chatScreen.dart';
 import 'resetScreen.dart';
 
 class LogInScreen extends StatefulWidget {
-  const LogInScreen({Key? key}) : super(key: key);
+  // final User user;
+  // final UserModel userModel;
+
+  // const LogInScreen({super.key, required this.user, required this.userModel});
 
   @override
   State<LogInScreen> createState() => _LogInScreenState();
@@ -19,22 +24,28 @@ class LogInScreen extends StatefulWidget {
 class _LogInScreenState extends State<LogInScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  User? user;
+
   checkValues() async {
     if (emailController.text.trim() == "" || passwordController.text == "") {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("all field mendatory")));
     } else {
-      signUp(emailController.text.trim(), passwordController.text);
+      logIn(emailController.text.trim(), passwordController.text);
     }
   }
 
-  signUp(String email, String password) async {
+  logIn(String email, String password) async {
     UserCredential? credential;
     try {
       credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+      // Navigator.push(
+      //     context,
+      //     MaterialPageRoute(
+      //         builder: (_) => HomeScreen(
+      //               user: widget.user,
+      //               userModel: widget.userModel,
+      //             )));
     } on FirebaseAuthException catch (ex) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(ex.code.toString())));
@@ -43,11 +54,21 @@ class _LogInScreenState extends State<LogInScreen> {
       String uid = credential.user!.uid;
 
       DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-          .collection("chatapp_user")
+          .collection("chatAppUsers")
           .doc(uid)
           .get();
       UserModel userModel =
-          UserModel.fromMap(documentSnapshot as Map<String, dynamic>);
+          UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
+      log("successfully");
+      print("done");
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  HomeScreen(user: credential!.user!, userModel: userModel)));
+    } else {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("User Doesn't Exist")));
     }
   }
 

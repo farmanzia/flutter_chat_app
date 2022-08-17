@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:chatapp_firebase/main.dart';
 import 'package:chatapp_firebase/models/chatRoomModel.dart';
+import 'package:chatapp_firebase/models/messageModel.dart';
 import 'package:chatapp_firebase/models/userModel.dart';
 import 'package:chatapp_firebase/screen/chatScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,12 +10,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
-  User user = FirebaseAuth.instance.currentUser as User;
-  UserModel? userModel;
+  final User user;
 
-  // SearchScreen(this.userModel, this.user);
+  final UserModel userModel;
 
-  // SearchScreen(this.userModel, this.user);
+  const SearchScreen({required this.user, required this.userModel});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -24,22 +26,22 @@ class _SearchScreenState extends State<SearchScreen> {
     ChatRoomModel chatRoom;
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection("chatrooms")
-        .where("participent.${widget.userModel!.uid}", isEqualTo: true)
+        .where("participent.${widget.userModel.uid}", isEqualTo: true)
         .where("participent.${targetUser.uid}", isEqualTo: true)
         .get();
-    if (snapshot.docs.length > 0) {
-      //fetch existing chatroom
+    if (snapshot.docs.isNotEmpty) {
       var dataDocs = snapshot.docs[0].data();
       ChatRoomModel existingchatroom =
           ChatRoomModel.fromMap(dataDocs as Map<String, dynamic>);
       chatRoom = existingchatroom;
     } else {
+      // log("no created yet");
       //create new one chatroom
       ChatRoomModel newChatRoom = ChatRoomModel(
           chatid: uuid.v1(),
           lastMessage: "",
           participent: {
-            widget.userModel!.uid.toString(): true,
+            widget.userModel.uid.toString(): true,
             targetUser.uid.toString(): true
           });
       await FirebaseFirestore.instance
@@ -85,9 +87,9 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
               StreamBuilder(
                   stream: FirebaseFirestore.instance
-                      .collection("chatapp_user")
+                      .collection("chatAppUsers")
                       .where("email", isEqualTo: controller.text.trim())
-                      .where("email", isNotEqualTo: widget.user.email)
+                      .where("email", isNotEqualTo: widget.userModel.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.active) {
@@ -110,7 +112,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       targetuser: searchedUder,
                                       chatRoomModel: chatRoomModel,
                                       user: widget.user,
-                                      userModel: widget.userModel!,
+                                      userModel: widget.userModel,
                                     );
                                   }));
                                 }
