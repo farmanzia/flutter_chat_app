@@ -67,60 +67,6 @@ class _CompleteProfileState extends State<CompleteProfile> {
             });
   }
 
-  // uploadData(String email, String password) async {
-  //   UserCredential? userCredential;
-  //   try {
-  //     userCredential = await FirebaseAuth.instance
-  //         .createUserWithEmailAndPassword(email: email, password: password);
-  //     Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //             builder: (_) => LogInScreen(widget.user, widget.userModel)));
-  //   } on FirebaseAuthException catch (ex) {
-  //     ScaffoldMessenger.of(context)
-  //         .showSnackBar(SnackBar(content: Text(ex.code.toString())));
-  //   }
-  //   //save data to firestore database
-  //   if (userCredential != null) {
-  //     // UserModel userFullName =
-  //     // UserModel(fullname: fullNamecontroller.text.trim());
-  //     String emailStorage = userCredential.user!.email.toString();
-  //     String uid = userCredential.user!.uid;
-
-  //     // String imgUrl;
-  //     final firebaseStorage = FirebaseStorage.instance;
-  //     var file = File(imageFile!.path);
-  //     if (imageFile != null) {
-  //       var snapshot = await firebaseStorage
-  //           .ref('profilePictures')
-  //           .child(widget.userModel!.email.toString())
-  //           .putFile(file);
-  //       TaskSnapshot taskSnapshot = await snapshot;
-
-  //       String imageUrl = await snapshot.ref.getDownloadURL();
-
-  //       setState(() {
-  //         imgUrl = imageUrl;
-  //       });
-  //     }
-  //     UserModel userModel = UserModel(
-  //         uid: userCredential.user!.uid,
-  //         fullname: fullNamecontroller.text,
-  //         email: emailController.text.trim(),
-  //         profilepic: imgUrl);
-  //     await FirebaseFirestore.instance
-  //         .collection("chatAppUsers")
-  //         .doc(uid)
-  //         .set(userModel.toMap());
-  //     //       {
-  //     //   "full_name": fullNamecontroller.text,
-  //     //   "email": emailController.text.trim(),
-  //     //   "imgUrl": imgUrl
-  //     // }
-
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
