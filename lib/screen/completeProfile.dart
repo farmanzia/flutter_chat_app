@@ -170,7 +170,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
   }
 
   pickedImage(ImageSource source) async {
-    final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
+    final pickedFile = await imagePicker.getImage(source: source);
 
     setState(() {
       imageFile = pickedFile;
