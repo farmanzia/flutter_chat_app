@@ -20,6 +20,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  bool _checkedValue = true;
   TextEditingController fullNamecontroller = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -88,6 +89,7 @@ class _SignUpState extends State<SignUp> {
               children: [
                 const Text("Chat App",
                     style: TextStyle(
+                      fontWeight: FontWeight.bold,
                       fontSize: 30,
                       color: Colors.teal,
                     )),
@@ -116,14 +118,27 @@ class _SignUpState extends State<SignUp> {
                   height: 12,
                 ),
                 TextFormField(
+                  obscureText: _checkedValue,
                   controller: passwordController,
-                  decoration: const InputDecoration(hintText: "Password"),
+                  decoration: InputDecoration(
+                    hintText: "Password",
+                    suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _checkedValue = !_checkedValue;
+                          });
+                        },
+                        child: _checkedValue != false
+                            ? Icon(Icons.visibility_off)
+                            : Icon(Icons.visibility)),
+                  ),
                 ),
                 const SizedBox(
                   height: 12,
                 ),
                 TextFormField(
                   controller: rpasswordController,
+                  obscureText: _checkedValue,
                   decoration:
                       const InputDecoration(hintText: "Repeat Password"),
                 ),
@@ -139,7 +154,7 @@ class _SignUpState extends State<SignUp> {
                         onPressed: () {
                           checkValues();
                         },
-                        child: const Text("GO Next"))),
+                        child: const Text("Go To Complete Profile"))),
                 const SizedBox(
                   height: 8,
                 ),
