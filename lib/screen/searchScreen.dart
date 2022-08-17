@@ -96,7 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       if (snapshot.hasData) {
                         QuerySnapshot querySnapshot =
                             snapshot.data as QuerySnapshot;
-                        if (querySnapshot.docs.isNotEmpty) {
+                        if (querySnapshot.docs.length > 0) {
                           Map<String, dynamic> map = querySnapshot.docs[0]
                               .data() as Map<String, dynamic>;
                           UserModel searchedUder = UserModel.fromMap(map);
@@ -118,11 +118,11 @@ class _SearchScreenState extends State<SearchScreen> {
                                 }
                               },
                               leading: CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage(searchedUder.profilepic!),
+                                backgroundImage: NetworkImage(
+                                    searchedUder.profilepic.toString()),
                               ),
-                              title: Text(searchedUder.fullname!),
-                              subtitle: Text(searchedUder.email!),
+                              title: Text(searchedUder.fullname.toString()),
+                              subtitle: Text(searchedUder.email.toString()),
                               trailing: Icon(
                                 Icons.arrow_forward_ios,
                                 size: 16,

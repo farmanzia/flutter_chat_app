@@ -60,6 +60,7 @@ class _ChatScreenState extends State<ChatScreen> {
     var uid;
     return Scaffold(
         appBar: AppBar(
+            elevation: 0,
             leading: IconButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -158,7 +159,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
               )),
               Padding(
-                padding: const EdgeInsets.only(top: 4, bottom: 8.0),
+                padding: const EdgeInsets.only(top: 4, bottom: 3.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   crossAxisAlignment: CrossAxisAlignment.end,

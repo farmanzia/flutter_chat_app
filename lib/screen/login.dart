@@ -22,6 +22,7 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  bool _checkedValue = true;
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
@@ -61,11 +62,12 @@ class _LogInScreenState extends State<LogInScreen> {
           UserModel.fromMap(documentSnapshot.data() as Map<String, dynamic>);
       log("successfully");
       print("done");
-      Navigator.push(
+      Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  HomeScreen(user: credential!.user!, userModel: userModel)));
+                  HomeScreen(user: credential!.user!, userModel: userModel)),
+          (route) => false);
     } else {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("User Doesn't Exist")));
@@ -84,13 +86,10 @@ class _LogInScreenState extends State<LogInScreen> {
             children: [
               const Text("Chat App",
                   style: TextStyle(
+                    fontWeight: FontWeight.bold,
                     fontSize: 30,
                     color: Colors.teal,
                   )),
-              const Text(
-                "now come to close",
-                style: TextStyle(fontSize: 10),
-              ),
               const SizedBox(
                 height: 12,
               ),
@@ -103,7 +102,18 @@ class _LogInScreenState extends State<LogInScreen> {
               ),
               TextFormField(
                 controller: passwordController,
-                decoration: const InputDecoration(hintText: "Password"),
+                obscureText: _checkedValue,
+                decoration: InputDecoration(
+                    hintText: "Password",
+                    suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _checkedValue = !_checkedValue;
+                          });
+                        },
+                        child: _checkedValue != false
+                            ? Icon(Icons.visibility_off)
+                            : Icon(Icons.visibility))),
               ),
               const SizedBox(
                 height: 24,
