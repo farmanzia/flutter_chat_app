@@ -88,8 +88,8 @@ class _SearchScreenState extends State<SearchScreen> {
               StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection("chatAppUsers")
-                      .where("email", isEqualTo: controller.text.trim())
-                      .where("email", isNotEqualTo: widget.userModel.uid)
+                      .where("fullname", isEqualTo: controller.text.trim())
+                      .where("fullname", isNotEqualTo: widget.userModel.uid)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.active) {
