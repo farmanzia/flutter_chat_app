@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chatapp_firebase/models/userModel.dart';
+import 'package:chatapp_firebase/screen/homeScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -71,8 +72,11 @@ class _SignUpState extends State<SignUp> {
           .then((value) => Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (_) => CompleteProfile(
-                      userModel: adduserModel, user: userCredential!.user!))));
+                  builder: (_) => HomeScreen(
+                      user: userCredential!.user!, userModel: adduserModel)
+                  //  CompleteProfile(
+                  //     userModel: adduserModel, user: userCredential!.user!)
+                  )));
     }
   }
 
@@ -154,7 +158,7 @@ class _SignUpState extends State<SignUp> {
                         onPressed: () {
                           checkValues();
                         },
-                        child: const Text("Go To Complete Profile"))),
+                        child: const Text("SignUp"))),
                 const SizedBox(
                   height: 8,
                 ),

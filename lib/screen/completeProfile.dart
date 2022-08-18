@@ -74,7 +74,9 @@ class _CompleteProfileState extends State<CompleteProfile> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: Icon(
               Icons.arrow_back_ios,
               color: Colors.teal,
@@ -119,28 +121,32 @@ class _CompleteProfileState extends State<CompleteProfile> {
                 ),
                 TextFormField(
                   controller: firstcontroller,
-                  decoration: const InputDecoration(hintText: "First Name"),
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person), hintText: "First Name"),
                 ),
                 const SizedBox(
                   height: 12,
                 ),
                 TextFormField(
                   controller: lastController,
-                  decoration: const InputDecoration(hintText: "Last Name"),
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.person), hintText: "Last Name"),
                 ),
                 const SizedBox(
                   height: 12,
                 ),
                 TextFormField(
                   controller: phoneController,
-                  decoration: const InputDecoration(hintText: "Phone"),
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.phone), hintText: "Phone"),
                 ),
                 const SizedBox(
                   height: 12,
                 ),
                 TextFormField(
                   controller: addressController,
-                  decoration: const InputDecoration(hintText: "address"),
+                  decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.place), hintText: "address"),
                 ),
                 const SizedBox(
                   height: 12,
@@ -157,7 +163,7 @@ class _CompleteProfileState extends State<CompleteProfile> {
                         onPressed: () {
                           checkValues();
                         },
-                        child: const Text("Final Close"))),
+                        child: const Text("Update"))),
                 const SizedBox(
                   height: 8,
                 ),

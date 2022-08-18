@@ -60,38 +60,39 @@ class _ChatScreenState extends State<ChatScreen> {
     var uid;
     return Scaffold(
         appBar: AppBar(
-            elevation: 0,
-            leading: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.arrow_back),
-            ),
-            automaticallyImplyLeading: true,
-            title: Row(
-              children: [
-                CircleAvatar(
-                    backgroundImage: NetworkImage(
-                  widget.targetuser.profilepic.toString(),
-                )),
-                const SizedBox(width: 8),
-                Text(widget.targetuser.fullname.toString())
-              ],
-            ),
-            centerTitle: true,
-            actions: [
-              InkWell(
-                onTap: () async {
-                  await FirebaseAuth.instance
-                    ..signOut().then((value) => Navigator.push(context,
-                        MaterialPageRoute(builder: (_) => LogInScreen())));
-                },
-                child: const Icon(Icons.logout),
-              ),
-              const SizedBox(
-                width: 8,
-              )
-            ]),
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
+          automaticallyImplyLeading: true,
+          title: Row(
+            children: [
+              CircleAvatar(
+                  backgroundImage: NetworkImage(
+                widget.targetuser.profilepic.toString(),
+              )),
+              const SizedBox(width: 8),
+              Text(widget.targetuser.fullname.toString())
+            ],
+          ),
+          centerTitle: true,
+          // actions: [
+          //   InkWell(
+          //     onTap: () async {
+          //       await FirebaseAuth.instance
+          //         ..signOut().then((value) => Navigator.push(context,
+          //             MaterialPageRoute(builder: (_) => LogInScreen())));
+          //     },
+          //     child: const Icon(Icons.logout),
+          //   ),
+          //   const SizedBox(
+          //     width: 8,
+          //   )
+          // ]
+        ),
         body: SafeArea(
           child: Container(
             child: Column(children: [
