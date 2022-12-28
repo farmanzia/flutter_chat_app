@@ -2,18 +2,13 @@ import 'dart:developer';
 
 import 'package:chatapp_firebase/models/firbaseHelper.dart';
 import 'package:chatapp_firebase/screen/homeScreen.dart';
-import 'package:chatapp_firebase/screen/searchScreen.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import 'models/userModel.dart';
-import 'screen/chatScreen.dart';
-import 'screen/completeProfile.dart';
 import 'screen/login.dart';
-import 'screen/signup.dart';
 
 var uuid = Uuid();
 
@@ -55,7 +50,7 @@ class LoggedIn extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Chat App',
       theme: ThemeData(primarySwatch: Colors.teal),
       home: HomeScreen(user: user, userModel: userModel),
     );
